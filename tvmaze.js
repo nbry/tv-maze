@@ -57,6 +57,11 @@ function populateShows(shows) {
              <img class="card-img-top" src=${show.image}>
              <p class="card-text">${show.summary}</p>
            </div>
+            <div>
+              <button class="btn btn-success btn-block">
+                Episodes
+              </button>
+           <div>
          </div>
        </div>
       `);
@@ -94,4 +99,7 @@ async function getEpisodes(id) {
   //       http://api.tvmaze.com/shows/SHOW-ID-HERE/episodes
 
   // TODO: return array-of-episode-info, as described in docstring above
+
+  const response = await axios.get(`https://api.tvmaze.com/shows/${id}/episodes`)
+  return response.data;
 }
