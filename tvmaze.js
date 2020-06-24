@@ -92,9 +92,11 @@ async function appendEpisodes(id) {
 }
 
 
-$("#shows-list").on("click", ".episode-button", async function handleEpisodeClick(evt) {
+$("#shows-list").on("click", ".episode-button", async function handleEpisodeClick(event) {
+  event.preventDefault();
   $('#episodes-list').text('');
-  let showId = $(evt.target).closest(".Show").data("show-id");
+  let showId = $(event.target).closest(".Show").data("show-id");
   // let episodes = await getEpisodes(showId);
+  $('html,body').animate({ scrollTop: $(document).height() }, 1000);
   appendEpisodes(showId);
 });
