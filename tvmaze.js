@@ -19,10 +19,15 @@
  */
 const missing_image = "https://tinyurl.com/tv-missing";
 
-async function renderList(query) {
+async function searchShows(query) {
+  const response = await axios.get('https://api.tvmaze.com/search/shows', { params: { q: query } });
+  return response.data;
+}
+
+async function renderShows(query) {
   const searched = await searchShows(query);
   const array = [];
-  const shows = searched.map(result => {
+  searched.map(result => {
     const obj = {};
     obj.id = result.show.id;
     obj.name = result.show.name;
@@ -34,11 +39,6 @@ async function renderList(query) {
   return array;
 }
 
-
-async function searchShows(query) {
-  const response = await axios.get('https://api.tvmaze.com/search/shows', { params: { q: query } });
-  return response.data;
-}
 
 /** Populate shows list:
  *     - given list of shows, add shows to DOM
@@ -83,7 +83,7 @@ $("#search-form").on("submit", async function handleSearch(evt) {
 
   $("#episodes-area").hide();
 
-  let shows = await renderList(query);
+  let shows = await renderShows(query);
 
   populateShows(shows);
 });
@@ -94,12 +94,31 @@ $("#search-form").on("submit", async function handleSearch(evt) {
  */
 
 async function getEpisodes(id) {
-  // TODO: get episodes from tvmaze
-  //       you can get this by making GET request to
-  //       http://api.tvmaze.com/shows/SHOW-ID-HERE/episodes
-
-  // TODO: return array-of-episode-info, as described in docstring above
-
   const response = await axios.get(`https://api.tvmaze.com/shows/${id}/episodes`)
   return response.data;
+}
+
+async function renderEpisodes(id){
+  const episodes = await getEpisodes(id);
+  const array = [];
+  episodes.map(result => {
+    const obj = {};
+    obj.season = result.season;
+    obj.episode = result.number;
+    obj.about = result.summary ? result.summary : "<p>no info</p>";
+    array.push(obj)
+    return obj;
+  });
+  return array;
+}
+
+async function appendEpisodes(id) {
+  const episodes = await renderEpisodes(id);
+  for (let episode of episodes) {
+    let $epi = $(
+      `<li><b>Season ${episode.season}, Episode ${episode.episode}:</b> ${episode.about}</li>`
+    );
+    $('#episodes-list').append($epi);
+  };
+  $('#episodes-area').show();
 }
